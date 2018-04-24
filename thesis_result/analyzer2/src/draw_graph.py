@@ -3,9 +3,10 @@ from matplotlib import ticker
 from enum import Enum
 import os
 import numpy as np
+import sys
 
-COLOR_LIST = ['r', 'g', 'b', 'm', 'c', 'y', 'k']
-STYLE_LIST = ['-', '--', '-.', ':', '-', '--', '-.', ':']
+COLOR_LIST = ['r', 'g', 'b', 'm', 'c', 'y', 'k', 'r', 'g', 'b', 'm', 'c', 'y', 'k']
+STYLE_LIST = ['-', '--', '-.', ':', '-', '--', '-.', ':', '-', '--', '-.', ':', '-', '--', '-.', ':']
 
 class Mode(Enum):
     NORMAL = 0
@@ -306,6 +307,9 @@ def drawLineGraph(X, Y, X_labels, x_val, y_val, fig_name, is_math):
         plt.legend(loc='upper right')
     else:
         plt.legend(loc='upper right')
+
+    if y_val is Yvalue.FAILURE:
+        plt.legend(loc='lower right')
 
     # if x_val is Xvalue.DUPLICATION and y_val is Yvalue.COLLISION:
     #     plt.legend(loc='upper left')
@@ -826,34 +830,36 @@ def drawEnergyByDuplicationEachDistance():
     plt.savefig(fig_name)
     plt.close('all')
 
-# 何もしない/SW-ARQのみ/パケット化するがFECしない(分割数5/10/20)
+# packet数とrate
 def classifyData(data_dict, all_file_list):
-    return_list = [[] for i in range(5)]
+    return_list = [[] for i in range(9)]
     for name in all_file_list:
         data = data_dict[name]
+        index = 0
         # FEC
-        if data.params["FEC"]:
-            packetNum = data.params["FEC_packet"]
-            if packetNum == 5:
-                return_list[2].append(name)
-            elif packetNum == 10:
-                return_list[3].append(name)
-            elif packetNum == 20:
-                return_list[4].append(name)
-        # FECしない
-        else:
-            # なにもしない
-            if data.params["rto_type"] == "0":
-                return_list[0].append(name)
-            # SW-ARQのみ
-            elif data.params["rto_type"] == "2":
-                return_list[1].append(name)
+        packetNum = data.params["FEC_packet"]
+        rate = int(data.params["FEC_rate"] * 100)
+        if packetNum == 5:
+            index = 0
+        elif packetNum == 10:
+            index = 3
+        elif packetNum == 20:
+            index = 6
+
+        if rate == 83:
+            pass
+        elif rate == 71:
+            index += 1
+        elif rate == 62:
+            index += 2
+
+        return_list[index].append(name)
 
     return return_list
 
 def getSpecificInfo(data_dict, file_lists, y_val):
-    X = [[30, 50, 70, 90] for i in range(5)]
-    Y = [[] for i in range(5)]
+    X = [[30, 50, 70, 90] for i in range(9)]
+    Y = [[] for i in range(9)]
     i = 0
     for file_list in file_lists:
         for name in file_list:
@@ -869,8 +875,11 @@ def drawSpecificGraph(data_dict, all_file_list, y_val):
     x_val = Xvalue.DISTANCE
     each_val = Xvalue.DUPLICATION
     file_list = classifyData(data_dict, all_file_list)
-    X_labels = ["None", "SW-ARQ", "FEC5", "FEC10", "FEC20"]
-    fig_name = dir_path + '/' + "compare_{}1.png".format(y_val.name.lower())
+
+    X_labels = ["FEC5-83", "FEC5-71", "FEC5-62",
+    "FEC10-83", "FEC10-71", "FEC10-62",
+    "FEC20-83", "FEC20-71", "FEC20-62"]
+    fig_name = dir_path + '/' + "compare_{}2.png".format(y_val.name.lower())
     X, Y = getSpecificInfo(data_dict, file_list, y_val)
     is_math = False
     if max(max(Y)) > 10 ** 5:

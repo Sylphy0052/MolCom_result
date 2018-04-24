@@ -63,7 +63,11 @@ class SimData:
             self.params["rto_type"] = self.config_file_name.split("RTO")[1][0]
         if not self.config["FEC"].type == "NONE":
             # self.params["FEC_rate"] = self.config["FEC"].rate
-            self.params["FEC_rate"] = int(self.rate)
+            rate = self.rate
+            rate = rate * 100
+            rate = int(rate)
+            rate = float(rate / 100.0)
+            self.params["FEC_rate"] = rate
             self.params["FEC_packet"] = self.config["FEC"].require_packet
             self.params["FEC"] = True
         else:
@@ -73,6 +77,10 @@ class SimData:
         self.params["std"] = self.output_data.std
         self.params["failure"] = self.output_data.transmission_failure_rate
         self.params["coll"] = self.input_data.sum_collisions / len(self.input_data.steps)
+        try:
+            self.params["retransmit_num"] = self.input_data.failure_count
+        except:
+            self.params["retransmit_num"] = 0
 
         # self.params["r"] = int(self.output_data.analytical_model.r)
         # for mp in self.config["moleculeParams"]:
