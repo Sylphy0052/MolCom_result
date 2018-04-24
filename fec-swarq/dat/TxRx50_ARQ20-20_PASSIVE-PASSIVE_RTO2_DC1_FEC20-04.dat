@@ -1,0 +1,27 @@
+mediumDimensionX 200
+mediumDimensionY 200
+mediumDimensionZ 200
+maxSimulationStep 25000000
+transmitter (-25, 0, 0) 3 (-25, 0, 0)
+receiver (25, 0, 0) 3 (25, 0, 0)
+numMessages 1
+numRetransmissions 5
+retransmitWaitTime 49577
+stepLengthX 1
+stepLengthY 1
+stepLengthZ 1
+moleculeParams 20 INFO PASSIVE 0 0
+moleculeParams 20 ACK PASSIVE 0 0
+moleculeParams 0 NOISE 0
+velRail 1
+drobDRail 0.5
+useCollisions 1
+useAcknowledgements 1
+decomposing 0
+assembling 1
+FEC PARITYCHECK 20 0.4
+outputFile TxRx50_ARQ20-20_PASSIVE-PASSIVE_RTO2_DC1_FEC20-04.txt
+pakcetStepLengthX 3.1518257252383863
+pakcetStepLengthY 3.1518257252383863
+pakcetStepLengthZ 3.1518257252383863
+packetDiameter 0.1369034890688318
