@@ -5,7 +5,7 @@ import os
 import numpy as np
 import sys
 
-COLOR_LIST = ['r', 'g', 'b', 'm', 'c', 'y', 'k', 'r', 'g', 'b', 'm', 'c', 'y', 'k']
+COLOR_LIST = ['r', 'b', 'g', 'm', 'y', 'k', 'c', 'r', 'b', 'g', 'm', 'y', 'k', 'c']
 STYLE_LIST = ['-', '--', '-.', ':', '-', '--', '-.', ':', '-', '--', '-.', ':', '-', '--', '-.', ':']
 
 class Mode(Enum):
@@ -40,7 +40,6 @@ class Yvalue(Enum):
     MOLECULENUM = 7
     DECOMPOSINGNUM = 8
     RETRANSMITFAILURE = 9
-
 
 def checkMode(data_dict, all_file_list):
     for file_name in all_file_list:
@@ -594,7 +593,7 @@ def getY(data, y_val):
     elif y_val is Yvalue.DECOMPOSINGNUM:
         return data.params["decomposing_num"] / len(data.input_data.steps)
     elif y_val is Yvalue.RETRANSMITFAILURE:
-        return data.params["retransmit_failure"]
+        return data.params["retransmit_num"]
     else:
         return 0
 
@@ -909,18 +908,35 @@ def checkType(data):
     if data.params["FEC"]:
         rate = int(data.params["FEC_rate"] * 100)
         if rate == 100:
-            return "FEC100"
+            return "p=5, Code rate=1.0"
         elif rate == 83:
-            return "FEC83"
+            return "p=5, Code rate=0.83"
         elif rate == 71:
-            return "FEC71"
+            return "p=5, Code rate=0.71"
         elif rate == 62:
-            return "FEC62"
+            return "p=5, Code rate=0.62"
     else:
         if data.params["rto_type"] == "0":
-            return "None"
+            return "Duplication only"
         elif data.params["rto_type"] == "2":
             return "SW-ARQ"
+
+def returnIndex(data):
+    if data.params["FEC"]:
+        rate = int(data.params["FEC_rate"] * 100)
+        if rate == 100:
+            return 2
+        elif rate == 83:
+            return 3
+        elif rate == 71:
+            return 4
+        elif rate == 62:
+            return 5
+    else:
+        if data.params["rto_type"] == "0":
+            return 0
+        elif data.params["rto_type"] == "2":
+            return 1
 
 def drawCumprobGraph(data_dict, all_file_list):
         dir_path = "figures"
@@ -929,18 +945,25 @@ def drawCumprobGraph(data_dict, all_file_list):
         file_list = classifyData(data_dict, all_file_list)
 
         for fileNames in file_list:
-            X_labels = []
+            X_labels = ["" for i in range(6)]
             X = [[0] for i in range(6)]
             Y = [[0] for i in range(6)]
-            i = 0
+            # i = 0
             for name in fileNames:
                 data = data_dict[name]
+                index = returnIndex(data)
                 label = checkType(data)
-                X_labels.append(label)
-                Y[i].extend(data.plot_data.cum_prob)
+
+                X_labels[index] = label
+                Y[index].extend(data.plot_data.cum_prob)
                 for j in data.plot_data.plot_range:
-                    X[i].append(j[1])
-                i += 1
+                    X[index].append(j[1])
+
+                # X_labels.append(label)
+                # Y[i].extend(data.plot_data.cum_prob)
+                # for j in data.plot_data.plot_range:
+                #     X[i].append(j[1])
+                # i += 1
             fig_name = dir_path + '/' + "cumprob{}.png".format(data_dict[fileNames[0]].params["r"])
 
             for i in range(len(fileNames)):

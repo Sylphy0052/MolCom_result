@@ -5,7 +5,7 @@ import os
 import numpy as np
 import sys
 
-COLOR_LIST = ['r', 'g', 'b', 'm', 'c', 'y', 'k', 'r', 'g', 'b', 'm', 'c', 'y', 'k']
+COLOR_LIST = ['r', 'b', 'g', 'm', 'y', 'k', 'c', 'r', 'b', 'g', 'm', 'y', 'k', 'c']
 STYLE_LIST = ['-', '--', '-.', ':', '-', '--', '-.', ':', '-', '--', '-.', ':', '-', '--', '-.', ':']
 
 class Mode(Enum):
@@ -311,6 +311,10 @@ def drawLineGraph(X, Y, X_labels, x_val, y_val, fig_name, is_math):
     if y_val is Yvalue.FAILURE:
         plt.legend(loc='lower right')
 
+    if y_val is Yvalue.RETRANSMITFAILURE:
+        plt.ylim([-5, 100])
+        plt.legend(loc='upper right')
+
     # if x_val is Xvalue.DUPLICATION and y_val is Yvalue.COLLISION:
     #     plt.legend(loc='upper left')
 
@@ -594,7 +598,7 @@ def getY(data, y_val):
     elif y_val is Yvalue.DECOMPOSINGNUM:
         return data.params["decomposing_num"] / len(data.input_data.steps)
     elif y_val is Yvalue.RETRANSMITFAILURE:
-        return data.params["retransmit_failure"]
+        return data.params["retransmit_num"]
     else:
         return 0
 
@@ -857,23 +861,35 @@ def classifyRateData(data_dict, file_list):
     return return_list
 
 def getSpecificInfo(data_dict, file_list, y_val):
-    X = [[] for i in range(2)]
-    Y = [[] for i in range(2)]
-    X_labels = []
+    X = [[] for i in range(4)]
+    Y = [[] for i in range(4)]
+    X_labels = ["" for i in range(4)]
     i = 0
 
     for names in file_list:
         data = data_dict[names[0]]
-        pre_data = data.params["numRetransmissions"]
-        if pre_data == 0:
-            X_labels.append("FEC")
+        a = data.params["r"]
+        b = data.params["numRetransmissions"]
+        if b == 0:
+            if a == 30:
+                i = 0
+                X_labels[i] = "FEC only, d=30"
+            elif a == 50:
+                i = 1
+                X_labels[i] = "FEC only, d=50"
+            # X_labels.append("FEC")
         else:
-            X_labels.append("FEC and SW-ARQ")
+            if a == 30:
+                i = 2
+                X_labels[i] = "ARQ_backed FEC, p=5, d=30"
+            elif a == 50:
+                i = 3
+                X_labels[i] = "ARQ_backed FEC, p=5, d=50"
+            # X_labels.append("FEC and SW-ARQ")
 
         for name in names:
             X[i].append(int(data_dict[name].params["FEC_rate"] * 100))
             Y[i].append(getY(data_dict[name], y_val))
-        i += 1
 
     return [X, Y, X_labels]
 
@@ -883,11 +899,13 @@ def drawSpecificGraph(data_dict, all_file_list, y_val):
         os.makedirs(dir_path)
     x_val = Xvalue.RATE
     file_list = classifyData(data_dict, all_file_list)
+    # file_list = all_file_list
 
     for fileNames in file_list:
         data = data_dict[fileNames[0]]
-        r = data.params["r"]
-        fig_name = dir_path + '/' + "compare_distance{}_{}3.png".format(str(r), y_val.name.lower())
+        # r = data.params["r"]
+        # fig_name = dir_path + '/' + "compare_distance{}_{}3.png".format(str(r), y_val.name.lower())
+        fig_name = dir_path + '/' + "compare_{}3.png".format(y_val.name.lower())
         files = classifyRateData(data_dict, fileNames)
 
         X, Y, X_labels = getSpecificInfo(data_dict, files, y_val)
@@ -902,7 +920,7 @@ def drawGraph(data_dict, all_file_list):
 
     drawSpecificGraph(data_dict, all_file_list, Yvalue.MEDIAN)
     drawSpecificGraph(data_dict, all_file_list, Yvalue.JITTER)
-    drawSpecificGraph(data_dict, all_file_list, Yvalue.FAILURE)
+    drawSpecificGraph(data_dict, all_file_list, Yvalue.RETRANSMITFAILURE)
 
     # mode = checkMode(data_dict, all_file_list)
     # is_ptime, is_coll = checkOption(data_dict, all_file_list)

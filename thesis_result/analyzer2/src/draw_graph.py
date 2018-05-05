@@ -5,7 +5,7 @@ import os
 import numpy as np
 import sys
 
-COLOR_LIST = ['r', 'g', 'b', 'm', 'c', 'y', 'k', 'r', 'g', 'b', 'm', 'c', 'y', 'k']
+COLOR_LIST = ['r', 'b', 'g', 'm', 'y', 'k', 'c', 'r', 'b', 'g', 'm', 'y', 'k', 'c']
 STYLE_LIST = ['-', '--', '-.', ':', '-', '--', '-.', ':', '-', '--', '-.', ':', '-', '--', '-.', ':']
 
 class Mode(Enum):
@@ -311,6 +311,10 @@ def drawLineGraph(X, Y, X_labels, x_val, y_val, fig_name, is_math):
     if y_val is Yvalue.FAILURE:
         plt.legend(loc='lower right')
 
+    if y_val is Yvalue.RETRANSMITFAILURE:
+        plt.ylim([-5, 100])
+        plt.legend(loc='upper right')
+
     # if x_val is Xvalue.DUPLICATION and y_val is Yvalue.COLLISION:
     #     plt.legend(loc='upper left')
 
@@ -594,7 +598,7 @@ def getY(data, y_val):
     elif y_val is Yvalue.DECOMPOSINGNUM:
         return data.params["decomposing_num"] / len(data.input_data.steps)
     elif y_val is Yvalue.RETRANSMITFAILURE:
-        return data.params["retransmit_failure"]
+        return data.params["retransmit_num"]
     else:
         return 0
 
@@ -876,9 +880,12 @@ def drawSpecificGraph(data_dict, all_file_list, y_val):
     each_val = Xvalue.DUPLICATION
     file_list = classifyData(data_dict, all_file_list)
 
-    X_labels = ["FEC5-83", "FEC5-71", "FEC5-62",
-    "FEC10-83", "FEC10-71", "FEC10-62",
-    "FEC20-83", "FEC20-71", "FEC20-62"]
+    X_labels = [
+        "p=5, Code rate=0.83", "p=5, Code rate=0.71", "p=5, Code rate=0.62",
+        "p=10, Code rate=0.83", "p=10, Code rate=0.71", "p=10, Code rate=0.62",
+        "p=20, Code rate=0.83", "p=20, Code rate=0.71", "p=20, Code rate=0.62"
+    ]
+
     fig_name = dir_path + '/' + "compare_{}2.png".format(y_val.name.lower())
     X, Y = getSpecificInfo(data_dict, file_list, y_val)
     is_math = False
@@ -892,7 +899,7 @@ def drawGraph(data_dict, all_file_list):
 
     drawSpecificGraph(data_dict, all_file_list, Yvalue.MEDIAN)
     drawSpecificGraph(data_dict, all_file_list, Yvalue.JITTER)
-    drawSpecificGraph(data_dict, all_file_list, Yvalue.FAILURE)
+    drawSpecificGraph(data_dict, all_file_list, Yvalue.RETRANSMITFAILURE)
 
     # mode = checkMode(data_dict, all_file_list)
     # is_ptime, is_coll = checkOption(data_dict, all_file_list)

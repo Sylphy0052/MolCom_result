@@ -4,7 +4,7 @@ from enum import Enum
 import os
 import numpy as np
 
-COLOR_LIST = ['r', 'g', 'b', 'm', 'c', 'y', 'k']
+COLOR_LIST = ['r', 'b', 'g', 'm', 'y', 'k', 'c', 'r', 'b', 'g', 'm', 'y', 'k', 'c']
 STYLE_LIST = ['-', '--', '-.', ':', '-', '--', '-.', ':']
 
 class Mode(Enum):
@@ -310,6 +310,10 @@ def drawLineGraph(X, Y, X_labels, x_val, y_val, fig_name, is_math):
     if y_val is Yvalue.FAILURE:
         plt.legend(loc='lower right')
 
+    if y_val is Yvalue.RETRANSMITFAILURE:
+        plt.ylim([-5, 100])
+        plt.legend(loc='upper right')
+
     # if x_val is Xvalue.DUPLICATION and y_val is Yvalue.COLLISION:
     #     plt.legend(loc='upper left')
 
@@ -593,7 +597,7 @@ def getY(data, y_val):
     elif y_val is Yvalue.DECOMPOSINGNUM:
         return data.params["decomposing_num"] / len(data.input_data.steps)
     elif y_val is Yvalue.RETRANSMITFAILURE:
-        return data.params["retransmit_failure"]
+        return data.params["retransmit_num"]
     else:
         return 0
 
@@ -858,6 +862,7 @@ def getSpecificInfo(data_dict, file_lists, y_val):
     X = [[30, 50, 70, 90] for i in range(5)]
     Y = [[] for i in range(5)]
     i = 0
+
     for file_list in file_lists:
         for name in file_list:
             Y[i].append(getY(data_dict[name], y_val))
@@ -872,7 +877,7 @@ def drawSpecificGraph(data_dict, all_file_list, y_val):
     x_val = Xvalue.DISTANCE
     each_val = Xvalue.DUPLICATION
     file_list = classifyData(data_dict, all_file_list)
-    X_labels = ["None", "SW-ARQ", "FEC5", "FEC10", "FEC20"]
+    X_labels = ["Duplication only", "SW-ARQ", "p=5, Code rate=1.0", "p=10, Code rate=1.0", "p=20, Code rate=1.0"]
     fig_name = dir_path + '/' + "compare_{}1.png".format(y_val.name.lower())
     X, Y = getSpecificInfo(data_dict, file_list, y_val)
     is_math = False
@@ -884,9 +889,12 @@ def drawGraph(data_dict, all_file_list):
     # Each simulation graph
     # drawBySimulation(data_dict, all_file_list)
 
+    # print("Median")
     drawSpecificGraph(data_dict, all_file_list, Yvalue.MEDIAN)
+    # print("Jitter")
     drawSpecificGraph(data_dict, all_file_list, Yvalue.JITTER)
-    drawSpecificGraph(data_dict, all_file_list, Yvalue.FAILURE)
+    # print("Failure")
+    drawSpecificGraph(data_dict, all_file_list, Yvalue.RETRANSMITFAILURE)
 
     # mode = checkMode(data_dict, all_file_list)
     # is_ptime, is_coll = checkOption(data_dict, all_file_list)

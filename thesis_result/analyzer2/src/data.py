@@ -80,7 +80,7 @@ class SimData:
         try:
             self.params["retransmit_num"] = self.input_data.failure_count
         except:
-            self.params["retransmit_num"] = 0
+            self.params["retransmit_num"] = self.output_data.transmission_failure_rate
 
         # self.params["r"] = int(self.output_data.analytical_model.r)
         # for mp in self.config["moleculeParams"]:
