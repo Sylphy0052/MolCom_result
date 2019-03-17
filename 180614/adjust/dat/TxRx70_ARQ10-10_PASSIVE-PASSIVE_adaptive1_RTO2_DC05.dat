@@ -1,0 +1,45 @@
+***From Distance
+mediumDimensionX 280
+mediumDimensionY 280
+mediumDimensionZ 280
+transmitter (-35, 0, 0) 3 (-35, 0, 0)
+receiver (35, 0, 0) 3 (35, 0, 0)
+
+***Constant Value
+maxSimulationStep 25000000
+velRail 1
+probDRail 0.5
+
+***From numMessages
+numMessages 1
+
+***From numRetransmissions
+numRetransmissions 250000
+
+***From rtoType
+retransmitWaitTime 182417
+
+***From DC
+stepLengthX 1.0
+stepLengthY 1.0
+stepLengthZ 1.0
+
+***Molecule Params
+moleculeParams 10 INFO PASSIVE 1 1.36
+moleculeParams 10 ACK PASSIVE 1 1.36
+moleculeParams 0 NOISE 0
+
+***Decomposing Type
+decomposing 0
+
+***useCollisions
+useCollisions 1
+
+***useAcknowledgements
+useAcknowledgements 1
+
+***From FEC or not
+assembling 0
+
+***Output File Name
+outputFile TxRx70_ARQ10-10_PASSIVE-PASSIVE_adaptive1_RTO2_DC05.txt

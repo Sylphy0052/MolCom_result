@@ -1,0 +1,45 @@
+***From Distance
+mediumDimensionX 360
+mediumDimensionY 360
+mediumDimensionZ 360
+transmitter (-45, 0, 0) 3 (-45, 0, 0)
+receiver (45, 0, 0) 3 (45, 0, 0)
+
+***Constant Value
+maxSimulationStep 25000000
+velRail 1
+probDRail 0.5
+
+***From numMessages
+numMessages 1
+
+***From numRetransmissions
+numRetransmissions 250000
+
+***From rtoType
+retransmitWaitTime 356720
+
+***From DC
+stepLengthX 1.0
+stepLengthY 1.0
+stepLengthZ 1.0
+
+***Molecule Params
+moleculeParams 40 INFO PASSIVE 0 1.36
+moleculeParams 40 ACK PASSIVE 0 1.36
+moleculeParams 0 NOISE 0
+
+***Decomposing Type
+decomposing 3
+
+***useCollisions
+useCollisions 1
+
+***useAcknowledgements
+useAcknowledgements 1
+
+***From FEC or not
+assembling 0
+
+***Output File Name
+outputFile TxRx90_ARQ40-40_PASSIVE-PASSIVE_RTO2_DC05_1messages_decomposing3.txt
